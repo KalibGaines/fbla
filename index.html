@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Partners Directory</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+    <script>
+        function validateForm() {
+            var nameInput = document.getElementById('name').value;
+            var contactInput = document.getElementById('contact').value;
+        
+            // Check if name contains only letters and not numbers
+            if (!/^[a-zA-Z]+$/.test(nameInput)) {
+                alert('Please enter a valid name with only letters.');
+                return false;
+            }
+        
+            // Check if contact is a valid email address
+            if (!/^.+@.+\..+$/.test(contactInput) || !contactInput.endsWith('.com')) {
+                alert('Please enter a valid email address ending with .com');
+                return false;
+            }
+        
+            return true; // Form is valid
+        }
+        </script>
+</head>
+<body>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-9">
+                <h1>Partners Directory</h1>
+                <div id="add-partner-container">
+                    <button id="toggle-add-partner" class="btn btn-primary mb-3">Add Partner</button>
+                    <form action="/add" method="post" id="add-partner-form" style="display: none;" onsubmit="return validateForm()">
+                        <input type="text" id="name" name="name" placeholder="Name" required>
+                        <input type="text" name="company" placeholder="Company" required>
+                        <input type="text" name="position" placeholder="Position" required>
+                        <input type="text" id="contact" name="contact" placeholder="Contact" required>
+                        <input type="text" name="summary" placeholder="Summary" required>
+                        <button type="submit" class="btn btn-primary">Add Partner</button>
+                    </form>
+                </div>
+                <form action="/" method="get" class="mb-3">
+                    <input type="text" name="query" placeholder="Search by category">
+                    <button type="submit" class="btn btn-secondary">Search</button>
+                </form>
+
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Company</th>
+                            <th>Position</th>
+                            <th>Contact</th>
+                            <th>Summary</th>
+                            <th>
+                                Actions
+                                <button type="button" id="toggle-actions" class="btn btn-info btn-sm">Toggle Actions</button>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for partner in partners %}
+                        <tr>
+                            <td>{{ partner.name }}</td>
+                            <td>{{ partner.company }}</td>
+                            <td>{{ partner.position }}</td>
+                            <td>{{ partner.contact }}</td>
+                            <td>{{ partner.summary }}</td>
+                            <td>
+                                <div class="action-buttons" style="display: none;">
+                                    <a href="{{ url_for('edit_partner', id=partner.id) }}" class="btn btn-primary">Edit</a>
+                                    <form action="{{ url_for('remove_partner', id=partner.id) }}" method="post" style="display: inline;">
+                                        <input type="submit" value="Delete" class="btn btn-danger" onclick="return confirm('Are you sure?');">
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <div class="col-md-3">
+                <h2 data-toggle="collapse" data-target="#faqAccordion" aria-expanded="false" aria-controls="faqAccordion" style="cursor: pointer;">FAQ?</h2>
+                <div id="faqAccordion" class="collapse">
+                    <div class="card">
+                        <div class="card-header" id="headingOne">
+                            <h5 class="mb-0">
+                                <button class="btn btn-link" data-toggle="collapse" data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                                    How do I add a partner?
+                                </button>
+                            </h5>
+                        </div>
+                        <div id="collapseOne" class="collapse" aria-labelledby="headingOne" data-parent="#faqAccordion">
+                            <div class="card-body">
+                                To add a partner, click the "Add Partner" button above and fill out the form.
+                            </div>
+                        </div>
+                        <div class="card-header" id="headingTwo">
+                            <h5 class="mb-0">
+                                <button class="btn btn-link" data-toggle="collapse" data-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                                    How can I search for a partner?
+                                </button>
+                            </h5>
+                        </div>
+                        <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#faqAccordion">
+                            <div class="card-body">
+                                Use the search bar at the top of the page to search by partner name or company.
+                            </div>
+                        </div>
+                        <div class="card-header" id="headingThree">
+                            <h5 class="mb-0">
+                                <button class="btn btn-link" data-toggle="collapse" data-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                                    How do I delete a partner?
+                                </button>
+                            </h5>
+                        </div>
+                        <div id="collapseThree" class="collapse" aria-labelledby="headingThree" data-parent="#faqAccordion">
+                            <div class="card-body">
+                                To delete a partner, find the partner in the list, then click the "Delete" button next to their name. You will be asked to confirm the deletion.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        $(document).ready(function() {
+            $('#toggle-add-partner').click(function() {
+                $('#add-partner-form').toggle();
+                var buttonText = $('#toggle-add-partner').text();
+                if (buttonText === 'Add Partner') {
+                    $('#toggle-add-partner').text('Go Back');
+                } else {
+                    $('#toggle-add-partner').text('Add Partner');
+                }
+            });
+
+            $('#toggle-actions').click(function() {
+                $('.action-buttons').toggle();
+            });
+
+            $('#toggle-edit-actions').click(function() {
+                $('.edit-actions').toggle();
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Edit Partner</title>
+    <!-- Link to your style.css file -->
+    <link rel="stylesheet" type="text/css" href="style.css">
+</head>
+<body>
+    <h1>Edit Partner</h1>
+    <form action="" method="post">
+        <input type="text" name="name" value="{{ partner.name }}" required>
+        <input type="text" name="company" value="{{ partner.company }}" required>
+        <input type="text" name="position" value="{{ partner.position }}" required>
+        <input type="text" name="contact" value="{{ partner.contact }}" required>
+        <textarea name="summary" required>{{ partner.summary }}</textarea>
+        <button type="submit">Update Partner</button>
+    </form>
+</body>
+</html>
